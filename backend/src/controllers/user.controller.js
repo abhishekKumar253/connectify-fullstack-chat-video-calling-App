@@ -151,7 +151,7 @@ export const getOutgoingFriendReqs = async (req, res) => {
       status: "pending",
     }).populate(
       "recipient",
-      "fullName profilePic nativeLanguage, learningLanguage"
+      "fullName profilePic nativeLanguage learningLanguage"
     );
 
     res.status(200).json(outgoingRequests);
