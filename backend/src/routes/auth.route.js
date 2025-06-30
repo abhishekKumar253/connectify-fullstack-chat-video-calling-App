@@ -14,6 +14,9 @@ router.post("/login", login);
 router.post("/logout", logout);
 router.post("/onboarding", protectRoute, onboard);
 
+// forget-password
+// send-reset-password-email-username
+
 router.get("/me", protectRoute, (req, res) => {
   res.status(200).json({ success: true, user: req.user });
 });
