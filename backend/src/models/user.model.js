@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema(
       required: [true, "Password is required"],
       minLength: [6, "Password must be at least 6 characters"],
     },
+    lastLogin: {
+      type: Date,
+      default: Date.now,
+    },
     bio: {
       type: String,
       default: "",
@@ -54,6 +58,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    resetPasswordToken: String,
+    resetPasswordTokenExpiresAt: Date,
+    verificationToken: String,
+    verificationTokenExpiresAt: Date,
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,

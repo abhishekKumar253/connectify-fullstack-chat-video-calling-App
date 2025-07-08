@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import { sendVerificationEmail, sendWelcomeEmail } from "../resend/emails.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 import { upsertStreamUser } from "../utils/stream.js";
 
@@ -30,12 +31,18 @@ export const signup = async (req, res) => {
     const idx = Math.floor(Math.random() * 100) + 1;
     const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
 
+    const verificationToken = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
     const newUser = await User.create({
       fullName,
       username,
       email,
       password,
       profilePic: randomAvatar,
+      verificationToken,
+      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 + 1000,
     });
 
     try {
@@ -51,11 +58,47 @@ export const signup = async (req, res) => {
 
     generateTokenAndSetCookie(res, newUser._id);
 
+    await sendVerificationEmail(newUser.email, verificationToken);
+
     const { password: _, ...safeUser } = newUser._doc;
 
     res.status(201).json({ success: true, user: safeUser });
   } catch (error) {
     console.log("Error in signup controller", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const verifyEmail = async (req, res) => {
+  const { code } = req.body;
+  try {
+    const user = await User.findOne({
+      verificationToken: code,
+      verificationTokenExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired verification code",
+      });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiresAt = undefined;
+    await user.save();
+
+    await sendWelcomeEmail(user.email, user.fullName);
+
+    const { password: _, ...safeUser } = user._doc;
+    res.status(200).json({
+      success: true,
+      message: "Email verified! Welcome 🎉",
+      user: safeUser,
+    });
+  } catch (error) {
+    console.log("Error in verifyEmail controller", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -83,6 +126,9 @@ export const login = async (req, res) => {
 
     generateTokenAndSetCookie(res, user._id);
 
+    user.lastLogin = new Date();
+    await user.save();
+
     const { password: _, ...safeUser } = user._doc;
     res.status(200).json({ success: true, user: safeUser });
   } catch (error) {
@@ -95,6 +141,7 @@ export const logout = async (req, res) => {
   res.clearCookie("token");
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
+
 
 export const onboard = async (req, res) => {
   try {
