@@ -1,7 +1,13 @@
 import User from "../models/user.model.js";
-import { sendVerificationEmail, sendWelcomeEmail } from "../resend/emails.js";
+import {
+  sendPasswordResetEmail,
+  sendResetSuccessEmail,
+  sendVerificationEmail,
+  sendWelcomeEmail,
+} from "../resend/emails.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 import { upsertStreamUser } from "../utils/stream.js";
+import crypto from "crypto";
 
 export const signup = async (req, res) => {
   const { fullName, username, email, password } = req.body;
@@ -23,9 +29,9 @@ export const signup = async (req, res) => {
 
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
-      return res.status(400).json({
-        message: "Email or Username already exists, please use a diffrent one",
-      });
+      return res
+        .status(409)
+        .json({ message: "Email or Username already exists" });
     }
 
     const idx = Math.floor(Math.random() * 100) + 1;
@@ -142,6 +148,70 @@ export const logout = async (req, res) => {
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordTokenExpiresAt = resetTokenExpiresAt;
+    await user.save();
+
+    const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+    await sendPasswordResetEmail(user.email, resetURL);
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset link sent to your email",
+    });
+  } catch (error) {
+    console.log("Error in forgotPassword controller", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password || password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordTokenExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpiresAt = undefined;
+    await user.save();
+
+    await sendResetSuccessEmail(user.email);
+
+    res.status(200).json({
+      success: true,
+      message: "Your password has been successfully reset. You can now log in.",
+    });
+  } catch (error) {
+    console.log("Error in resetPassword controller", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 
 export const onboard = async (req, res) => {
   try {
