@@ -111,13 +111,15 @@ export const verifyEmail = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, username, password } = req.body;
+    const { identifier, password } = req.body;
 
-    if ((!email && !username) || !password) {
+    if (!identifier || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const user = await User.findOne({ $or: [{ username }, { email }] });
+    const user = await User.findOne({
+      $or: [{ username: identifier }, { email: identifier }],
+    });
     if (!user) {
       return res
         .status(402)
