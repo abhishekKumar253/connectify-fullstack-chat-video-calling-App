@@ -1,4 +1,4 @@
-import FriendRequest from "../models/friendRequest.model.js";
+import FriendRequest from "../models/FriendRequest.model.js";
 import User from "../models/user.model.js";
 
 export const getRecommendedUsers = async (req, res) => {
@@ -162,8 +162,8 @@ export const getFriendsRequests = async (req, res) => {
     }).populate("recipient", "fullName profilePic");
 
     res.status(200).json({
-      incomingPendingRequests,
-      sentAcceptedRequests,
+      incomingReqs: incomingPendingRequests,
+      acceptedReqs: sentAcceptedRequests,
     });
   } catch (error) {
     console.log("Error in getFriendsRequests controller", error.message);
