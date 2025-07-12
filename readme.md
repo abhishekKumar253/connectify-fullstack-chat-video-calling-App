@@ -13,7 +13,7 @@ A modern fullstack social platform with real-time chat, secure video calls, and 
 - ✉️ **Email Verification & Forgot Passwrod, Password Reset using Resend**
 - 🔐 JWT Authentication with Secure Cookies
 - 👤 User Onboarding with Avatar & Theme Setup
-- 🧑‍🤝‍🧑 Friends System (Your Friends Page)
+- 🧑‍🤝‍🧑 Friend System: Send, Accept, and Reject Friend Requests
 - 🔔 Notifications Page
 - 🎨 32 Beautiful UI Themes (Light/Dark + Variants)
 - 🌍 Fully Responsive Design + Mobile Hamburger Menu
