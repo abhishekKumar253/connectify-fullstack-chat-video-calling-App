@@ -74,6 +74,6 @@ VITE_STREAM_API_KEY=your_stream_api_key
 👤 Author
 Abhishek Kumar
 
-🌐 LinkedIn(<www.linkedin.com/in/abhishek-kumar-a391a422a>)
+🌐 [LinkedIn](https://www.linkedin.com/in/abhishek-kumar-a391a422a)
 
 📧 <abhishekkumar617559@gmail.com>
