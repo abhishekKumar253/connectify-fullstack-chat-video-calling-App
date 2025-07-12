@@ -69,18 +69,18 @@ VITE_STREAM_API_KEY=your_stream_api_key
 🧰 Installation & Run Locally
 
 1. Clone the Project
-git clone <https://github.com/your-username/connectify.git>
-cd connectify
+    git clone <https://github.com/your-username/connectify.git>
+    cd connectify
 
 2. Backend Setup
-cd backend
-npm install
-npm run dev
+    cd backend
+    npm install
+    npm run dev
 
 3. Frontend Setup
-cd frontend
-npm install
-npm run dev
+    cd frontend
+    npm install
+    npm run dev
 
 🌐 Deployment
 ✅ Fully deployable on Render
