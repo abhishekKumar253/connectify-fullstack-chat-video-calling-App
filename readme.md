@@ -73,14 +73,14 @@ VITE_STREAM_API_KEY=your_stream_api_key
     cd connectify
 
 2. Backend Setup
-    cd backend
-    npm install
-    npm run dev
+        cd backend
+        npm install
+        npm run dev
 
 3. Frontend Setup
-    cd frontend
-    npm install
-    npm run dev
+        cd frontend
+        npm install
+        npm run dev
 
 🌐 Deployment
 ✅ Fully deployable on Render
