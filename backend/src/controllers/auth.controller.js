@@ -35,7 +35,7 @@ export const signup = async (req, res) => {
     }
 
     const idx = Math.floor(Math.random() * 100) + 1;
-    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
+    const randomAvatar = `https://api.dicebear.com/9.x/adventurer/png?seed=${idx}`;
 
     const verificationToken = Math.floor(
       100000 + Math.random() * 900000
