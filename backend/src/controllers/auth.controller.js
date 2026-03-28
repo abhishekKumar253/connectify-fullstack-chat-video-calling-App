@@ -47,6 +47,7 @@ export const signup = async (req, res) => {
       email,
       password,
       profilePic: randomAvatar,
+      isVerified: true,
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 + 1000,
     });
